@@ -61,14 +61,14 @@ k_scaling_Ed_card = 0.01 # number at the divisor of the weight matrix  (nelle si
 Ed_speed = 5.10
 
 # Distribution for neurons
-k_scaling_P_D = 1 # number at the divisor # 77
+k_scaling_P_D_neurons = 1 # number at the divisor # 77
 k_scaling_P_D_edges = 1 # number at the divisor # 0.125
 
 # Read files
 # total volume of nodes (can be useful to scale the groups)
 N_card_vector = np.ones(n_columns) 
 #subdivision of neurons in the pools. Order: L2/3e L2/3i L4e L4i L5e L5i L6e L6i
-pop_card_vector = np.loadtxt(path_read_txt + 'P_D_cardinality.txt') / k_scaling_P_D
+pop_card_vector = np.loadtxt(path_read_txt + 'P_D_cardinality.txt') / k_scaling_P_D_neurons
 # connections between pools of the same node
 conn_intra_matrix = np.transpose(np.loadtxt(path_read_txt + 'P_D_connectivity.txt'))/k_scaling_P_D_edges
 conn_Ed_card_matrix = np.int_(np.loadtxt(path_read_txt + 'inter_weights.txt')/k_scaling_Ed_card)

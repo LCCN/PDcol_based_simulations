@@ -1,4 +1,4 @@
-################ Signal_extraction
+################ Extract_signals
 
 create_folder(multimeters_path)
 remove_folder_contents(multimeters_path)

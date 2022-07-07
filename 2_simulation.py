@@ -55,14 +55,14 @@ w_exc_to_inh_intra = 87.8 #87.8
 w_inh_to_inh_intra = -351.2 #-351.2 when balanced; -200 when unbalanced
 w_inh_to_exc_intra = -351.2 #-351.2 when balanced; -200 when unbalanced
 w_inter=1 
-k_scaling_Ed_card = 0.01 # number at the divisor of the weight matrix  (nelle simulazioni a 100)
+k_scaling_Ed_card = 0.01 # (divider) for weight matrix 
 
 # Delays 
 Ed_speed = 5.10
 
 # Distribution for neurons
-k_scaling_P_D_neurons = 1 # number at the divisor # 77
-k_scaling_P_D_edges = 1 # number at the divisor # 0.125
+k_scaling_P_D_neurons = 1 # (divider) number previously used: 77
+k_scaling_P_D_edges = 1 # (divider) number previously used: 0.125
 
 # Read files
 # total volume of nodes (can be useful to scale the groups)

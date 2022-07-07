@@ -1,0 +1,37 @@
+################ Signal_extraction
+
+create_folder(multimeters_path)
+remove_folder_contents(multimeters_path)
+# Move all the multimeters founded to a folder 
+files = glob('*multimeter-*')
+for file in files:
+    shutil.move(file, multimeters_path + '/' + file)
+    
+SimTime = simtime * 100
+
+
+data = []
+file_names = glob(multimeters_path + '/*multimeter-*')
+for file in file_names:
+    data.append(np.loadtxt(file,skiprows=3))
+
+vmdata= np.concatenate(data)
+
+# I worked till here
+quit()
+
+layerVnode1vm = vmdata[np.isin(vmdata[:,0], neuron_pop_dict['neuron_pop_exc1_3']), :]
+
+n = []
+for i in range(1,n_columns+1): #Changed these 2 lines
+    n[i] = vmdata[np.isin(vmdata[:,0], neuron_pop_dict['neuron_pop_exc' + str(i) + '_3']), :]
+
+signal = np.zeros([n_columns,SimTime])
+for t in range(0,SimTime):
+
+    for i in range(1,n_columns+1): #Changed these 3 lines
+        tmp = n[i][n[i][:,1] == t, 2]  #I'm not sure if this line works
+        signal[i, t-1] = np.mean(tmp[tmp > -70])
+    
+
+scipy.io.savemat('signal14nodes.mat', dict(signal14nodes= signal))

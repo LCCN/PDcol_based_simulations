@@ -1,0 +1,76 @@
+# ----- TESTING BLOCK ------ add this at the end of the code after running the other blocks
+
+# Print overall population dictionary
+print('Neuron population dictionary:')
+print(neuron_pop_dict)
+print('-----------------------------')
+print('Intra-connections and weights')
+print('-----------------------------')
+for column in range(1,n_columns+1):
+    print('Column number: ' + str(column))
+    
+    # # Devices connections: 
+    # print('----Devices connections----')
+    # path_normdevices_conns = results_path + 'NormDevices_Col' + str(column)
+    # normdevices_conns_file = open(path_normdevices_conns, "w") 
+    # normdevices_conns_matrix = np.zeros((8,8))
+    # path_thalamicdevices_conns = results_path + 'ThalamicDevices_Col' + str(column)
+    # thalamicdevices_conns_file = open(path_normdevices_conns, "w") 
+    # thalamicdevices_conns_matrix = np.zeros(8)
+    # for layer_num in range(1,n_layers+1): 
+    #     # for i,(neuron_type,poiss_type) in enumerate(zip(neuron_types,poisson_generators)):
+    #     #     print('----Normal Devices----')
+    #     #     target_pop_name = 'neuron_pop_' + neuron_type + str(col_num) + '_' + str(layer_num)
+    #     #     print('hi')
+    #     #     target_pop = neuron_pop_dict[source_pop_name]
+    #     #     connection = nest.GetConnections(poiss_type, target_pop)
+    #     #     print('hi')
+    #     #     num_connections = len(connection.get('source'))
+    #     #     normdevices_conns_matrix[2*(layer_num-1)+i] = num_connections
+    #     #     print('hi')
+    #     #     print(str(layer_num) + str(neuron_type) + ': ' + str(num_connections))
+
+
+    #     # if layer_num in thalamic_input_layers: #thalamic_gen_to columns 
+    #     #     print('----Thalamic Devices----')
+    #     #     target_pop_name = 'neuron_pop_' + neuron_type + str(col_num) + '_' + str(layer_num)
+    #     #     target_pop = neuron_pop_dict[source_pop_name]
+    #     #     print('helloooouuu')
+    #     #     connection = nest.GetConnections(thal_noise, target_pop)
+    #     #     num_connections = len(connection.get('source'))
+    #     #     normdevices_conns_matrix[2*(layer_num-1)+1] = num_connections
+    #     #     print(str(layer_num) + str(neuron_type) + ': ' + str(num_connections))
+        
+
+    
+    # Intra-layer connections: Print the number and weight of connections between all the pools 
+    print('----Intra-layer connections----')
+    path_weights = results_path + 'Weights_Col' + str(column)
+    path_num_connections = results_path + 'Connections#_Col' + str(column)
+    weights_file = open(path_weights, "w") 
+    num_connections_file = open(path_num_connections, "w") 
+    weights_matrix = np.zeros((8,8))
+    num_connections_matrix = np.zeros((8,8))
+    for source_layer in range(1,n_layers+1): # loop through all the layers #FROM
+        for i, source_neuron_type in enumerate(neuron_types): # loop through inhibitory and exhibitory pools
+            print('-------')
+            print('Source layer: ' + str(source_layer) + str(source_neuron_type))
+            source_pop_name = 'neuron_pop_' + source_neuron_type + str(col_num) + '_' + str(source_layer)
+            source_pop = neuron_pop_dict[source_pop_name]
+            for target_layer in range(1,n_layers+1): # loop through all the layers (connected layer) #TO
+                for j, target_neuron_type in enumerate(neuron_types):
+                    target_pop_name = 'neuron_pop_' + target_neuron_type + str(col_num) + '_' + str(target_layer)
+                    target_pop = neuron_pop_dict[target_pop_name]
+            
+                    connection = nest.GetConnections(source_pop, target_pop)
+                    num_connections = len(connection.get('source'))
+                    weight = connection.get('weight')[0]
+                    print('To ' + str(target_layer) + str(target_neuron_type) + ' : ' + 'Connection number: ' + str(num_connections) + ' Weight: ' + str(weight))
+                    # TBD: use numpy and add these respective numbers to their appropriate coordinates
+                    weights_matrix[(2*(source_layer-1)+i, 2*(target_layer-1)+j)] = weight # vertical/rows are source_pop, horizontal/columns are target_pop 
+                    num_connections_matrix[(2*(source_layer-1)+i, 2*(target_layer-1)+j)] = num_connections
+    # Save matricies
+    np.savetxt(path_weights, weights_matrix, fmt="%f")
+    np.savetxt(path_num_connections, num_connections_matrix, fmt="%f")
+    # np.savetxt(path_normdevices_conns, normdevices_conns_matrix, fmt="%f")
+    # np.savetxt(path_thalamicdevices_conns, thalamicdevices_conns_matrix, fmt="%f")

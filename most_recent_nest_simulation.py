@@ -180,7 +180,8 @@ for col_num in range(1,n_columns+1):
                                 conn_spec={'rule': 'fixed_total_number', 
                                            'N':int(conn_intra_matrix[2*(layer_num-1)+i, 2*(source_layer-1)+j] * k_scaling_P_D_neurons)}, 
                                 syn_spec={"weight": weights_dict})  
-    
+                    print(source_pop_name, target_pop_name)
+
     # Inter-node connections: exc_to_exc connections only
     for target_col in range(1,n_columns+1):
         if target_col != col_num: # we have already intra-node connections
@@ -188,12 +189,33 @@ for col_num in range(1,n_columns+1):
                 for target_layer_num in range(1,n_layers+1):     
                     source_pop_name = 'neuron_pop_exc' + str(col_num) + '_' + str(source_layer_num)
                     target_pop_name = 'neuron_pop_exc' + str(target_col) + '_' + str(target_layer_num)
-                    
                     nest.Connect(neuron_pop_dict[source_pop_name], neuron_pop_dict[target_pop_name], 
                                 conn_spec={'rule': 'fixed_total_number', 
                                            'N':conn_Ed_card_matrix[layer_num, target_col-1]}, 
                                 syn_spec={"weight":w_inter, 
                                           "delay":conn_Ed_lgth_matrix[layer_num, target_col-1]}) 
+
+# connections to 3inh and 4inh - have to modify for multiple columns 
+
+neuron_pops_col_1 = ['neuron_pop_exc1_1','neuron_pop_inh1_1','neuron_pop_exc1_2', 'neuron_pop_inh1_2', 'neuron_pop_exc1_3', 'neuron_pop_inh1_3', 'neuron_pop_exc1_4', 'neuron_pop_inh1_4']
+
+for name in neuron_pops_col_1:
+
+    if 'exc' in name: #exc to inh
+        weights_dict = w_exc_to_inh_intra
+    elif 'inh' in name:
+        weights_dict = w_inh_to_inh_intra
+
+    nest.Connect(neuron_pop_dict[name], neuron_pop_dict['neuron_pop_inh1_3'], 
+                                            conn_spec={'rule': 'fixed_total_number', 
+                                                    'N':int(conn_intra_matrix[2*(layer_num-1)+i, 2*(source_layer-1)+j] * k_scaling_P_D_neurons)}, 
+                                            syn_spec={"weight": weights_dict}) 
+
+    nest.Connect(neuron_pop_dict[name], neuron_pop_dict['neuron_pop_inh1_4'], 
+                conn_spec={'rule': 'fixed_total_number', 
+                            'N':int(conn_intra_matrix[2*(layer_num-1)+i, 2*(source_layer-1)+j] * k_scaling_P_D_neurons)}, 
+                syn_spec={"weight": weights_dict}) 
+
 
 # Net to spike detector
 for column in range(1,n_columns+1):
@@ -266,6 +288,8 @@ remove_folder_contents(results_path)
 dSD = nest.GetStatus(spikedet,keys="events")[0]
 events = dSD["senders"]
 times = dSD["times"]
+
+
 # _ = plot_events_times(times,events,"joint",results_path)
 
 # The index of neurons are fixed by nest so we need to get them to count how many 
@@ -322,13 +346,11 @@ df
 # ----- TESTING BLOCK ------
 
 # TEST
-# connection1 = nest.GetConnections(neuron_pop_dict['neuron_pop_exc1_1'], neuron_pop_dict['neuron_pop_exc1_1'])
 # num_connections1 = len(connection1.get('target'))
 # print(num_connections1)
 # connection2 = nest.GetConnections(neuron_pop_dict['neuron_pop_exc1_1'], neuron_pop_dict['neuron_pop_inh1_1'])
 # num_connections2 = len(connection2.get('target'))
 # print(num_connections2)
-
 
 # Print overall population dictionary
 print('Neuron population dictionary:')
@@ -388,7 +410,6 @@ for column in range(1,n_columns+1):
                 for j, target_neuron_type in enumerate(neuron_types):
                     target_pop_name = 'neuron_pop_' + target_neuron_type + str(col_num) + '_' + str(target_layer)
                     target_pop = neuron_pop_dict[target_pop_name]
-            
                     connection = nest.GetConnections(source_pop, target_pop)
                     num_connections = len(connection.get('source'))
                     weight = connection.get('weight')[0]
